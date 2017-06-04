@@ -1,0 +1,112 @@
+---
+title: 'Statisctical Inference Assignment Part-1: A simulation Exercise'
+author: "Benhur Tedros"
+date: "February 15, 2017"
+output: html_document
+---
+
+## Instructions
+
+The project consists of two parts:
+
+#### 1. A simulation exercise.
+#### 2. Basic inferential data analysis [this analysis is done in separate Rmd.file]
+
+
+You will create a report to answer the questions. Given the nature of the series, ideally you'll use knitr to create the reports and convert to a pdf. 
+
+### Part-1: Simulation Exercise
+
+In this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. Set lambda = 0.2 for all of the simulations. You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations.
+
+#### A) Set up the directory
+
+```{r setup, include=TRUE}
+
+setwd("F:/BENHUR FOLDER/Coursera/Statistical Reference/Week 4")
+library(ggplot2)
+
+```
+
+#### B) List the given variables in the problem and define them
+
+Number of average expontials: n=40
+Lamda=0.2
+Number of simulations: numsim=1000
+
+```{r set up variables, echo=TRUE}
+n<-40
+lamda<-0.2
+numsim<-1000
+
+```
+
+Set.seed() is essential when we generate randomly generated numbers such as simulation based estimation.
+rexp () will provide the n*numsim from the exponential distribution with lamda as its rate parameter.
+matrix () will rearrange the random variables (n*numsim).
+Apply () will be used to calculate the mean of each row.
+plots() will be generated for analysis.
+
+
+```{r hist, echo=TRUE}
+
+set.seed(13579)
+subset<-matrix(rexp(n*numsim,rate=lamda), numsim)
+subset_mean<-apply(subset,1,mean)
+hist(subset_mean,xlab="Mean of the subset data", col="purple")
+
+```
+
+#### Answering the questions
+
+##### A) To show the sample mean and compare it to the theoretical mean of the distribution.
+
+```{r theoretical mean, echo=TRUE}
+
+Theoretical_mean<-1/lamda
+Theoretical_mean
+
+```
+
+Actual center of distribution based on simulation
+
+```{r simulation mean, echo=TRUE}
+
+round(mean(subset_mean),2)
+
+```
+##### B) To show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution
+
+```{r theoretical variance and sd, echo=TRUE}
+
+Theoretical_var<-(1/lamda)^2/n
+Theoretical_var
+
+Theoretical_sd<-(1/lamda)/sqrt(n)
+Theoretical_sd
+
+```
+Actual variance and standard deviation based on simulation
+
+```{r simulation variance and sd, echo=TRUE}
+
+round(var(subset_mean),2)
+round(sd(subset_mean),2)
+
+```
+##### C) To show that the distribution is approximately normal
+
+  To prove the distribution of means are normal distributed (as CLT states), ggplot was used
+
+```{r normal distribution, echo=TRUE}
+
+data_normd<-data.frame(subset_mean)
+
+g<-ggplot(data_normd,aes(x=subset_mean),xlab="distribution of means")
+
+g +geom_histogram(aes(y=..density..),colour="blue",fill="orange")+geom_density() 
+
+```
+
+So, the result looks a normally distributed means.
+
