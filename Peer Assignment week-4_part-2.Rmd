@@ -1,0 +1,108 @@
+---
+title: 'Statistical Inference Assignment Part-2 : Basic Inferential Data Analysis'
+author: "Benhur Tedros"
+date: "February 14, 2017"
+output: word_document
+---
+
+## Instructions
+
+The project consists of basic inferential data analysis.We are going to analyze the ToothGrowth data in the R datasets package.
+
+1) Load the ToothGrowth data and perform some basic exploratory data analyses
+2) Provide a basic summary of the data.
+3) Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. 
+4) State your conclusions and the assumptions needed for your conclusions.
+
+### Part-2: Basic inferential data analysis 
+
+#### A) Load the ToothGrowth data and other required packages
+
+```{r setup, include=TRUE}
+
+setwd("F:/BENHUR FOLDER/Coursera/Statistical Reference/Week 4")
+library(ggplot2)
+data(ToothGrowth)
+
+```
+ 
+#### A.1) Exploring the data [Question 1 & 2]
+ 
+```{r Exploring Data, echo=TRUE}
+
+str(ToothGrowth)
+ToothGrowth
+
+```
+ 
+From the ToothGrowth data, the dose variable has three levels (0.5,1 and 2) which can be reformated to a factor. By doing that, let us see how the data looks like (summarize data) by making a quick plot
+
+```{r summarize, echo=TRUE}
+
+ToothGrowth$dose<-as.factor(ToothGrowth$dose)
+str(ToothGrowth)
+summary(ToothGrowth)
+
+```
+#### Making a plot
+```{r plot, echo=TRUE}
+
+g<-ggplot(data = ToothGrowth,aes(supp,len))+ facet_grid(~dose)+ geom_boxplot(aes(fill=supp)) + ggtitle("Tooth growth based on supplyment type and dosage (mg)") + xlab("Supplement Type") + ylab ("Tooth length")
+
+print(g)
+
+```
+
+In conclusion, the length of the tooth in OJ supplement type is more in each dosage than that of VC. However, with the increase in dosage, the length of the tooth increased for each type of supplements.
+
+#### B) Comparing the change in the tooth length based on supplement type and dosage [Question 3]
+
+#### Hypothesis-1 [related to supplement Types]
+
+Let us assume that the null hypothesis (H0) states there is no any change in tooth growth when give OJ or VC, and the alternative hyphothesis(Ha) says there is an increase in tooth growth when OJ was used than VC.
+
+```{r supp length, echo=TRUE}
+
+VC.length <- ToothGrowth$len[ToothGrowth$supp == "VC"]
+OJ.length <- ToothGrowth$len[ToothGrowth$supp == "OJ"]
+
+```
+
+Use t-test and use the above vectors for the test
+
+
+```{r t.test, echo=TRUE}
+
+t.test(OJ.length,VC.length,alternative = "greater",paired=FALSE,var.equal = FALSE,
+       conf.level = 0.95)
+
+## alternative ="greater" tests the alternative hypothersis,OJ is greater than VC.
+```
+
+Based on the results, P-value is 3% which is less than the 5%. So we reject the null hyphothesis and accept that the effect of OJ on tooth growth is more than VC.
+
+#### Hypothesis-2 [related to dosages]
+
+```{r dosage length, echo=TRUE}
+
+dose_0.5 <- ToothGrowth$len[ToothGrowth$dose == "0.5"]
+dose_1 <- ToothGrowth$len[ToothGrowth$dose == "1"]
+dose_2 <- ToothGrowth$len[ToothGrowth$dose == "2"]
+
+```
+The null hyphothesis is till be "no difference in tooth growth when increasing dosage". Let us test dose_0.5 against dose_1 and dose_1 against dose_2
+
+```{r dosage test, echo=TRUE}
+## dose_0.5 and dose_1
+t.test(dose_0.5,dose_1,alternative = "less",paired=FALSE,var.equal = FALSE,
+       conf.level = 0.95)
+
+## dose_1 and dose_2
+t.test(dose_1,dose_2,alternative = "less",paired=FALSE,var.equal = FALSE,
+       conf.level = 0.95)
+```
+On both tests, the P-values are very small and the mean of the first dose (0.5) is less than that dose (1), and mean of dose(1) is less than the dose (2).  Based on that, we reject the null hypothesis. Therefore, it can be concluded the alternative hypothesis is true which mean with the increase in dosage, the tooth growth is more.
+
+#### Conclusion
+
+We have at least 95% confidence that the length of the tooth increases by increasing the dosage and/or using OJ supplement than VC.
